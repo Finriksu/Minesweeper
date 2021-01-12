@@ -12,6 +12,7 @@ namespace Minesweeper
 {
     public partial class MainForm : Form
     {
+        /*
         private Button btn1 = new Button();
         private Button btn2 = new Button();
         private Button btn3 = new Button();
@@ -20,6 +21,8 @@ namespace Minesweeper
         private Button btn6 = new Button();
         private Button btn7 = new Button();
         private Button btn8 = new Button();
+        */
+
         public MainForm()
         {
             InitializeComponent();
@@ -30,8 +33,27 @@ namespace Minesweeper
             Application.Exit();
         }
 
+        
+
         private void MainForm_Load(object sender, EventArgs e)
         {
+            int left = 12;
+            int top = 27;
+            
+            for (int i = 1; i <= 81; i++){
+                UncoveredTile tileAdd = new UncoveredTile();
+                tileAdd.Location = new Point(left, top);
+                
+                tileAdd.MouseDown += flagTile;
+                this.Controls.Add(tileAdd);
+                left += 20;
+                if (i != 0 && i % 9 == 0){
+                    top += 20;
+                    left = 12;
+                }
+            }
+
+            /*
             btn1.BackgroundImage = Properties.Resources.tileEmpty;
             btn1.FlatAppearance.BorderColor = ColorTranslator.FromHtml("#443830");
             btn1.FlatStyle = FlatStyle.Flat;
@@ -113,8 +135,9 @@ namespace Minesweeper
             btn8.Location = new System.Drawing.Point(152, 27);
 
             this.Controls.Add(btn8);
+            */
         }
-
+        /*
         private void btn7_MouseDown(object sender, MouseEventArgs e)
         {
             
@@ -133,15 +156,25 @@ namespace Minesweeper
                 
             }
         }
-
-        private void button1_Click(object sender, EventArgs e)
+        */
+        private void flagTile(object sender, MouseEventArgs e)
         {
+            Button clickedTile = sender as Button;
 
+            if (e.Button == MouseButtons.Right)
+            {
+                if (clickedTile.Name == "Uncovered")
+                {
+                    clickedTile.BackgroundImage = Properties.Resources.tileFlag;
+                    clickedTile.Name = "Flag";
+                }
+                else if (clickedTile.Name == "Flag")
+                {
+                    clickedTile.BackgroundImage = Properties.Resources.tileUncovered;
+                    clickedTile.Name = "Uncovered";
+                }
+            }
         }
 
-        private void button1_MouseClick(object sender, MouseEventArgs e)
-        {
-
-        }
     }
 }
