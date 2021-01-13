@@ -17,6 +17,7 @@ namespace Minesweeper
             this.FlatAppearance.BorderColor = ColorTranslator.FromHtml("#443830");
             this.FlatStyle = FlatStyle.Flat;
             this.TabStop = false;
+            this.Tag = "";
         }
     }
 }
