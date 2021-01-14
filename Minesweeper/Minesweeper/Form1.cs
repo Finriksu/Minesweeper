@@ -14,9 +14,7 @@ namespace Minesweeper
     {
         private Panel gamePanel = new Panel();
         Label timeLabel = new Label();
-        int hour;
-        int minute = 58;
-        int second = 50;
+        int second = -1;
         private int difficulty = 0;
         RadioButton easyRB = new RadioButton();
         RadioButton normalRB = new RadioButton();
@@ -259,11 +257,11 @@ namespace Minesweeper
             timeLabel.BackColor = Color.Black;
 
             if (difficulty == 0)
-                timeLabel.Location = new Point(52, 12);
+                timeLabel.Location = new Point(142, 12);
             else if (difficulty == 1)
-                timeLabel.Location = new Point(122, 12);
+                timeLabel.Location = new Point(282, 12);
             else
-                timeLabel.Location = new Point(262, 12);
+                timeLabel.Location = new Point(562, 12);
 
             gamePanel.Controls.Add(timeLabel);
             gameTimer.Start();
@@ -272,41 +270,19 @@ namespace Minesweeper
         private void t_Tick(object sender, EventArgs e)
         {
             string time = "";
-
-            if (second == 59)
-            {
-                second = 0;
-                minute += 1;
-            }
-            else
-                second++;
-
-            if (minute == 59 && second == 59)
-            {
-                minute = 0;
-                hour++;
-            }
-
-            if (hour < 10)
-                time += "0" + hour;
-            else
-                time += hour;
-
-            time += ":";
-
-            if (minute < 10)
-                time += "0" + minute;
-            else
-                time += minute;
-
-            time += ":";
+            second++;
 
             if (second < 10)
+                time += "00" + second;
+            else if (second < 100)
                 time += "0" + second;
             else
                 time += second;
 
-            timeLabel.Text = time;
+            if (second < 1000)
+                timeLabel.Text = time;
+            else
+                timeLabel.Text = "999";
         }
 
         private void toolStripMenuItem1_Click(object sender, EventArgs e)
