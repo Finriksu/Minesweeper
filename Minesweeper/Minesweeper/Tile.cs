@@ -19,5 +19,11 @@ namespace Minesweeper
             this.TabStop = false;
             this.Tag = "";
         }
+
+        public string Id
+        {
+            get { return Id; }
+            set { Id = value; }
+        }
     }
 }
