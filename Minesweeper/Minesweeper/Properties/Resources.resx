@@ -133,6 +133,12 @@
   <data name="tile5" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\tile5.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="tileBomb" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\tileBomb.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="tileBombHit" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\tileBombHit.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="tileEmpty" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\tileEmpty.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>

@@ -20,10 +20,24 @@ namespace Minesweeper
             this.Tag = "";
         }
 
-        public string Id
+        private int rowId;
+        private int columnId;
+
+        public int RowId
         {
-            get { return Id; }
-            set { Id = value; }
+            get { return rowId; } 
+            set { rowId = value; } 
+        }
+
+        public int ColumnId
+        {
+            get { return columnId; }
+            set { columnId = value; }
+        }
+
+        public void Disable()
+        {
+            this.Enabled = false;
         }
     }
 }

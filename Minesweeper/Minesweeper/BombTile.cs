@@ -14,7 +14,7 @@ namespace Minesweeper
         {
             this.Name = "Uncovered"; //Same name as uncoveredtile so that it will behave like it when clicked.
             this.Tag = "Bomb"; //Tag will determine if it actually is bomb and will be checked when clicked.
-            this.BackgroundImage = Properties.Resources.tileUncovered;
+            this.BackgroundImage = Properties.Resources.tileBomb;
             this.Enabled = true;
         }
     }

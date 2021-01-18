@@ -14,12 +14,18 @@ namespace Minesweeper
     {
         private Panel gamePanel = new Panel();
         Label timeLabel = new Label();
-        int second = -1;
+        Label flagLabel = new Label();
+        int second = 0;
         private int difficulty = 0;
         RadioButton easyRB = new RadioButton();
         RadioButton normalRB = new RadioButton();
         RadioButton hardRB = new RadioButton();
         Form difficultyForm = new Form();
+        bool gameOver = false;
+        Timer gameTimer = new Timer();
+        int flagCount;
+        int gameCount = 0;
+        List<Tile> tileList;
 
         public MainForm()
         {
@@ -39,8 +45,11 @@ namespace Minesweeper
         private void replaceTile(object sender, MouseEventArgs e)
         {
             Tile clickedTile = sender as Tile;
+            Tile repTile = new Tile();
             Point repLocation = clickedTile.Location;
             string repTag = clickedTile.Tag.ToString();
+            int repRowId = clickedTile.RowId;
+            int repColumnId = clickedTile.ColumnId;
 
             if (e.Button == MouseButtons.Right)
             {
@@ -48,24 +57,49 @@ namespace Minesweeper
                 { 
                     gamePanel.Controls.Remove(clickedTile);
 
-                    FlagTile repTile = new FlagTile();
+                    repTile = new FlagTile();
                     repTile.Location = repLocation;
                     repTile.Tag = repTag;
+                    repTile.RowId = repRowId;
+                    repTile.ColumnId = repColumnId;
                     repTile.MouseDown += replaceTile;
 
                     gamePanel.Controls.Add(repTile);
+
+                    flagCount--;
                 }
-                else if (clickedTile.Name.ToString() == "Flag")
+                else if (clickedTile.Name.ToString() == "Flag" && clickedTile.Tag.ToString() != "Bomb")
                 {
                     gamePanel.Controls.Remove(clickedTile);
 
-                    UncoveredTile repTile = new UncoveredTile();
+                    repTile = new UncoveredTile();
                     repTile.Location = repLocation;
                     repTile.Tag = repTag;
+                    repTile.RowId = repRowId;
+                    repTile.ColumnId = repColumnId;
                     repTile.MouseDown += replaceTile;
 
                     gamePanel.Controls.Add(repTile);
+
+                    flagCount++;
                 }
+                else if (clickedTile.Name.ToString() == "Flag" && clickedTile.Tag.ToString() == "Bomb")
+                {
+                    gamePanel.Controls.Remove(clickedTile);
+
+                    repTile = new BombTile();
+                    repTile.Location = repLocation;
+                    repTile.Tag = repTag;
+                    repTile.RowId = repRowId;
+                    repTile.ColumnId = repColumnId;
+                    repTile.MouseDown += replaceTile;
+
+                    gamePanel.Controls.Add(repTile);
+
+                    flagCount++;
+                }
+
+                flagLabel.Text = flagCount.ToString();
             }
             else if(e.Button == MouseButtons.Left)
             {
@@ -76,25 +110,96 @@ namespace Minesweeper
 
                     gamePanel.Controls.Remove(clickedTile);
 
-                    EmptyTile repTile = new EmptyTile();
+                    repTile = new EmptyTile();
                     repTile.Location = repLocation;
+                    repTile.RowId = repRowId;
+                    repTile.ColumnId = repColumnId;
                     repTile.MouseDown += replaceTile;
                     gamePanel.Controls.Add(repTile);
                 }
                 else if (clickedTile.Tag.ToString() == "Bomb" && clickedTile.Name != "Flag")
                 {
+                    gamePanel.Controls.Remove(clickedTile);
+
+                    repTile = new BombTile();
+                    repTile.Location = repLocation;
+                    repTile.Tag = repTag;
+                    repTile.RowId = repRowId;
+                    repTile.ColumnId = repColumnId;
+                    repTile.BackgroundImage = Properties.Resources.tileBombHit;
+                    repTile.MouseDown += replaceTile;
+
+                    gamePanel.Controls.Add(repTile);
+
+                    gameOver = true;
+                    
+                    foreach(Control x in gamePanel.Controls)
+                    {
+                        if(x is Tile)
+                        {
+                            ((Tile)x).Disable();
+                        }
+                    }
+                    
                     MessageBox.Show("lost");
+
+                }
+                checkAdjacent(repTile);
+                checkWin();
+            }
+        }
+        private void checkWin()
+        {
+            int tilesToWin = 0;
+            int tilesClicked = -2;
+            int tilesLeft = 0;
+            
+            foreach(Control x in gamePanel.Controls)
+            {
+                if(!(x is BombTile || x is FlagTile || x is UncoveredTile))
+                {
+                    tilesClicked++;
                 }
             }
+
+            switch (difficulty)
+            {
+                case 0:
+                    tilesToWin = 10;
+                    tilesLeft = 81;
+                    break;
+                case 1:
+                    tilesToWin = 40;
+                    tilesLeft = 256;
+                    break;
+                case 2:
+                    tilesToWin = 99;
+                    tilesLeft = 480;
+                    break;
+            }
+
+            if (tilesLeft - tilesClicked == tilesToWin && tilesToWin != 0)
+            {
+                foreach (Control x in gamePanel.Controls)
+                {
+                    if (x is Tile)
+                    {
+                        ((Tile)x).Disable();
+                    }
+                }
+                gameOver = true;
+                MessageBox.Show("Victory");
+            }
+                
         }
 
         private void createTiles()
         {
-            int left = 10;
-            int top = 50;
             int bombCount = 0;
             int tileCount = 0;
             int rowLenght = 0;
+
+            List<Tile> unMixedBombList = new List<Tile>();
 
             switch (difficulty)
             {
@@ -123,33 +228,83 @@ namespace Minesweeper
                     this.MinimumSize = new Size(636, 443);
                     break;
             }
-            
+
+            flagCount = bombCount;
+            flagLabel.Text = bombCount.ToString();
+
             for (int i = 1; i <= tileCount; i++)
             {
                 if (i <= bombCount)
                 {
                     BombTile tileAdd = new BombTile();
-                    tileAdd.Location = new Point(left, top);
+                    unMixedBombList.Add(tileAdd);
                     tileAdd.MouseDown += replaceTile;
-                    gamePanel.Controls.Add(tileAdd);
-                    left += 20;
                 }
                 else
                 {
                     UncoveredTile tileAdd = new UncoveredTile();
-                    tileAdd.Location = new Point(left, top);
+                    unMixedBombList.Add(tileAdd);
                     tileAdd.MouseDown += replaceTile;
-                    gamePanel.Controls.Add(tileAdd);
-                    left += 20;
-                    tileAdd.Tag = "";
                 }
 
-                if (i != 0 && i % rowLenght == 0)
-                {
-                    top += 20;
-                    left = 10;
-                }
+                
             }
+            List<Tile> mixedList = mixTiles(unMixedBombList, rowLenght);
+
+            for(int i = 0; i < mixedList.Count; i++)
+            {
+                gamePanel.Controls.Add(mixedList[i]);
+            }
+
+        }
+
+        private List<Tile> mixTiles(List<Tile> unMixedList, int rowLenght)
+        {
+            List<Tile> mixedList = new List<Tile>();
+            List<int> nums = new List<int>();
+
+            int left = 10;
+            int top = 50;
+
+            int row = 0;
+            int column = 0;
+
+            Random rnd = new Random();
+
+            for(int i = 1; i <= unMixedList.Count; i++)
+            {
+                int j = rnd.Next(0, unMixedList.Count);
+
+                if (nums.Contains(j)){
+                    i--;
+                }
+                else
+                {
+                    nums.Add(j);
+                    Tile replace = unMixedList.ElementAt(j);
+                    replace.Location = new Point(left, top);
+                    replace.RowId = row;
+                    replace.ColumnId = column;
+                    column++;
+                    left += 20;
+                    mixedList.Add(replace);
+
+                    if (i != 0 && i % rowLenght == 0)
+                    {
+                        top += 20;
+                        left = 10;
+                    }
+                }
+
+                if(column == rowLenght)
+                {
+                    column = 0;
+                    row++;
+                }
+
+            }
+
+            return mixedList;
         }
 
         private void chooseDifficulty()
@@ -193,16 +348,20 @@ namespace Minesweeper
             difficultyForm.Controls.Add(difficultyGroup);
             
             difficultyForm.ShowDialog();
+            gameOver = false;
+            
         }
 
         private void newGame()
         {
+            gameCount++;
             chooseDifficulty();
             difficultyForm.Controls.Clear();
             gamePanel.Controls.Clear();
+            getTime();
+            displayFlagCount();
             createPanel();
             createTiles();
-            getTime();
         }
 
         private void createPanel()
@@ -228,7 +387,7 @@ namespace Minesweeper
 
             gamePanel.Location = new Point(0, 24);
             gamePanel.Size = new Size(width, height);
-            gamePanel.BackColor = Color.Red;
+            gamePanel.BackColor = Color.LightGray;
             
             this.Controls.Add(gamePanel);
         }
@@ -242,19 +401,22 @@ namespace Minesweeper
             else
                 difficulty = 2;
 
+            gameOver = false;
+            second = 0;
             difficultyForm.Close();
         }
 
         private void getTime()
         {
-            Timer gameTimer = new Timer();
             gameTimer.Interval = 1000;
             gameTimer.Tick += new EventHandler(this.t_Tick);
+            gameTimer.Enabled = true;
 
             timeLabel.AutoSize = true;
             timeLabel.Font = new Font("Microsoft Sans Serif", 16);
             timeLabel.ForeColor = Color.Red;
             timeLabel.BackColor = Color.Black;
+            timeLabel.Text = "000";
 
             if (difficulty == 0)
                 timeLabel.Location = new Point(142, 12);
@@ -269,20 +431,192 @@ namespace Minesweeper
 
         private void t_Tick(object sender, EventArgs e)
         {
-            string time = "";
-            second++;
+            if (gameOver == false)
+            {
+                string time = "0";
+                second++;
 
-            if (second < 10)
-                time += "00" + second;
-            else if (second < 100)
-                time += "0" + second;
+                if (second/gameCount < 10)
+                    time += "0" + second/gameCount;
+                else
+                    time += second/gameCount;
+                if (second < 1000)
+                    timeLabel.Text = time;
+                else
+                    timeLabel.Text = "999";
+            }
             else
-                time += second;
+            {
+                gameTimer.Stop();
+                gameTimer.Enabled = false;
+            }
+                
+            
+                
+        }
 
-            if (second < 1000)
-                timeLabel.Text = time;
+        private void displayFlagCount()
+        {
+            flagLabel.AutoSize = true;
+            flagLabel.Font = new Font("Microsoft Sans Serif", 16);
+            flagLabel.ForeColor = Color.Red;
+            flagLabel.BackColor = Color.Black;
+
+            if (difficulty == 0)
+                flagLabel.Location = new Point(10, 12);
+            else if (difficulty == 1)
+                flagLabel.Location = new Point(10, 12);
             else
-                timeLabel.Text = "999";
+                flagLabel.Location = new Point(10, 12);
+
+            flagLabel.Text = flagCount.ToString();
+
+            gamePanel.Controls.Add(flagLabel);
+        }
+
+        private void checkAdjacent(Tile clickedTile)
+        {           
+            int clickedRow = clickedTile.RowId;
+            int clickedColumn = clickedTile.ColumnId;
+
+            int[] rowIds = new int[3];
+            int[] columnIds = new int[3];
+
+            rowIds[0] = clickedRow - 1;
+            rowIds[1] = clickedRow;
+            rowIds[2] = clickedRow + 1;
+
+            columnIds[0] = clickedColumn - 1;
+            columnIds[1] = clickedColumn;
+            columnIds[2] = clickedColumn + 1;
+
+            foreach (Control x in gamePanel.Controls)
+            {
+                if(x is Tile)
+                {
+                    Tile checkTile = x as Tile;
+
+                    if ((checkTile.RowId == rowIds[0]) && (checkTile.ColumnId == columnIds[0]))
+                    {
+                        if (!(checkTile is BombTile))
+                        {
+                            EmptyTile repTile = new EmptyTile();
+                            Point repLocation = x.Location;
+                            repTile.Location = repLocation;
+
+                            gamePanel.Controls.Remove(x);
+
+                            gamePanel.Controls.Add(repTile);
+                        }
+                    }
+                    else if ((checkTile.RowId == rowIds[0]) && (checkTile.ColumnId == columnIds[1]))
+                    {
+                        if (!(checkTile is BombTile))
+                        {
+                            EmptyTile repTile = new EmptyTile();
+                            Point repLocation = x.Location;
+                            repTile.Location = repLocation;
+
+                            gamePanel.Controls.Remove(x);
+
+                            gamePanel.Controls.Add(repTile);
+                        }
+                    }
+                    else if ((checkTile.RowId == rowIds[0]) && (checkTile.ColumnId == columnIds[2]))
+                    {
+                        if (!(checkTile is BombTile))
+                        {
+                            EmptyTile repTile = new EmptyTile();
+                            Point repLocation = x.Location;
+                            repTile.Location = repLocation;
+
+                            gamePanel.Controls.Remove(x);
+
+                            gamePanel.Controls.Add(repTile);
+                        }
+                    }
+                    else if ((checkTile.RowId == rowIds[1]) && (checkTile.ColumnId == columnIds[0]))
+                    {
+                        if (!(checkTile is BombTile))
+                        {
+                            EmptyTile repTile = new EmptyTile();
+                            Point repLocation = x.Location;
+                            repTile.Location = repLocation;
+
+                            gamePanel.Controls.Remove(x);
+
+                            gamePanel.Controls.Add(repTile);
+                        }
+                    }
+                    else if ((checkTile.RowId == rowIds[1]) && (checkTile.ColumnId == columnIds[1]))
+                    {
+                        if (!(checkTile is BombTile))
+                        {
+                            EmptyTile repTile = new EmptyTile();
+                            Point repLocation = x.Location;
+                            repTile.Location = repLocation;
+
+                            gamePanel.Controls.Remove(x);
+
+                            gamePanel.Controls.Add(repTile);
+                        }
+                    }
+                    else if ((checkTile.RowId == rowIds[1]) && (checkTile.ColumnId == columnIds[2]))
+                    {
+                        if (!(checkTile is BombTile))
+                        {
+                            EmptyTile repTile = new EmptyTile();
+                            Point repLocation = x.Location;
+                            repTile.Location = repLocation;
+
+                            gamePanel.Controls.Remove(x);
+
+                            gamePanel.Controls.Add(repTile);
+                        }
+                    }
+                    else if ((checkTile.RowId == rowIds[2]) && (checkTile.ColumnId == columnIds[0]))
+                    {
+                        if (!(checkTile is BombTile))
+                        {
+                            EmptyTile repTile = new EmptyTile();
+                            Point repLocation = x.Location;
+                            repTile.Location = repLocation;
+
+                            gamePanel.Controls.Remove(x);
+
+                            gamePanel.Controls.Add(repTile);
+                        }
+                    }
+                    else if ((checkTile.RowId == rowIds[2]) && (checkTile.ColumnId == columnIds[1]))
+                    {
+                        if (!(checkTile is BombTile))
+                        {
+                            EmptyTile repTile = new EmptyTile();
+                            Point repLocation = x.Location;
+                            repTile.Location = repLocation;
+
+                            gamePanel.Controls.Remove(x);
+
+                            gamePanel.Controls.Add(repTile);
+                        }
+                    }
+                    else if ((checkTile.RowId == rowIds[2]) && (checkTile.ColumnId == columnIds[2]))
+                    {
+                        if (!(checkTile is BombTile))
+                        {
+                            EmptyTile repTile = new EmptyTile();
+                            Point repLocation = x.Location;
+                            repTile.Location = repLocation;
+
+                            gamePanel.Controls.Remove(x);
+
+                            gamePanel.Controls.Add(repTile);
+                        }
+                    }
+                }
+            }
+
+
         }
 
         private void toolStripMenuItem1_Click(object sender, EventArgs e)

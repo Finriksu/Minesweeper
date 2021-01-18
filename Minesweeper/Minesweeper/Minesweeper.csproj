@@ -119,5 +119,11 @@
   <ItemGroup>
     <None Include="Resources\tileUncovered.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tileBomb.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tileBombHit.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

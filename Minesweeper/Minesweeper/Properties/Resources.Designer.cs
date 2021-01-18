@@ -113,6 +113,26 @@ namespace Minesweeper.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap tileBomb {
+            get {
+                object obj = ResourceManager.GetObject("tileBomb", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap tileBombHit {
+            get {
+                object obj = ResourceManager.GetObject("tileBombHit", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap tileEmpty {
             get {
                 object obj = ResourceManager.GetObject("tileEmpty", resourceCulture);
