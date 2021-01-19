@@ -490,129 +490,40 @@ namespace Minesweeper
             columnIds[1] = clickedColumn;
             columnIds[2] = clickedColumn + 1;
 
+            int j = 0;
+
+            
+
             foreach (Control x in gamePanel.Controls)
             {
                 if(x is Tile)
                 {
                     Tile checkTile = x as Tile;
 
-                    if ((checkTile.RowId == rowIds[0]) && (checkTile.ColumnId == columnIds[0]))
+                    for (int i = 0; i < 3; i++)
                     {
-                        if (!(checkTile is BombTile))
+                        if ((checkTile.RowId == rowIds[i]) && (checkTile.ColumnId == columnIds[j]))
                         {
-                            EmptyTile repTile = new EmptyTile();
-                            Point repLocation = x.Location;
-                            repTile.Location = repLocation;
+                            if (!(checkTile is BombTile))
+                            {
+                                EmptyTile repTile = new EmptyTile();
+                                Point repLocation = x.Location;
+                                repTile.Location = repLocation;
 
-                            gamePanel.Controls.Remove(x);
+                                gamePanel.Controls.Remove(x);
 
-                            gamePanel.Controls.Add(repTile);
+                                gamePanel.Controls.Add(repTile);
+                            }
+                        }
+
+                        if (i == 2 && j != 2)
+                        {
+                            i = 0;
+                            j++;
                         }
                     }
-                    else if ((checkTile.RowId == rowIds[0]) && (checkTile.ColumnId == columnIds[1]))
-                    {
-                        if (!(checkTile is BombTile))
-                        {
-                            EmptyTile repTile = new EmptyTile();
-                            Point repLocation = x.Location;
-                            repTile.Location = repLocation;
 
-                            gamePanel.Controls.Remove(x);
-
-                            gamePanel.Controls.Add(repTile);
-                        }
-                    }
-                    else if ((checkTile.RowId == rowIds[0]) && (checkTile.ColumnId == columnIds[2]))
-                    {
-                        if (!(checkTile is BombTile))
-                        {
-                            EmptyTile repTile = new EmptyTile();
-                            Point repLocation = x.Location;
-                            repTile.Location = repLocation;
-
-                            gamePanel.Controls.Remove(x);
-
-                            gamePanel.Controls.Add(repTile);
-                        }
-                    }
-                    else if ((checkTile.RowId == rowIds[1]) && (checkTile.ColumnId == columnIds[0]))
-                    {
-                        if (!(checkTile is BombTile))
-                        {
-                            EmptyTile repTile = new EmptyTile();
-                            Point repLocation = x.Location;
-                            repTile.Location = repLocation;
-
-                            gamePanel.Controls.Remove(x);
-
-                            gamePanel.Controls.Add(repTile);
-                        }
-                    }
-                    else if ((checkTile.RowId == rowIds[1]) && (checkTile.ColumnId == columnIds[1]))
-                    {
-                        if (!(checkTile is BombTile))
-                        {
-                            EmptyTile repTile = new EmptyTile();
-                            Point repLocation = x.Location;
-                            repTile.Location = repLocation;
-
-                            gamePanel.Controls.Remove(x);
-
-                            gamePanel.Controls.Add(repTile);
-                        }
-                    }
-                    else if ((checkTile.RowId == rowIds[1]) && (checkTile.ColumnId == columnIds[2]))
-                    {
-                        if (!(checkTile is BombTile))
-                        {
-                            EmptyTile repTile = new EmptyTile();
-                            Point repLocation = x.Location;
-                            repTile.Location = repLocation;
-
-                            gamePanel.Controls.Remove(x);
-
-                            gamePanel.Controls.Add(repTile);
-                        }
-                    }
-                    else if ((checkTile.RowId == rowIds[2]) && (checkTile.ColumnId == columnIds[0]))
-                    {
-                        if (!(checkTile is BombTile))
-                        {
-                            EmptyTile repTile = new EmptyTile();
-                            Point repLocation = x.Location;
-                            repTile.Location = repLocation;
-
-                            gamePanel.Controls.Remove(x);
-
-                            gamePanel.Controls.Add(repTile);
-                        }
-                    }
-                    else if ((checkTile.RowId == rowIds[2]) && (checkTile.ColumnId == columnIds[1]))
-                    {
-                        if (!(checkTile is BombTile))
-                        {
-                            EmptyTile repTile = new EmptyTile();
-                            Point repLocation = x.Location;
-                            repTile.Location = repLocation;
-
-                            gamePanel.Controls.Remove(x);
-
-                            gamePanel.Controls.Add(repTile);
-                        }
-                    }
-                    else if ((checkTile.RowId == rowIds[2]) && (checkTile.ColumnId == columnIds[2]))
-                    {
-                        if (!(checkTile is BombTile))
-                        {
-                            EmptyTile repTile = new EmptyTile();
-                            Point repLocation = x.Location;
-                            repTile.Location = repLocation;
-
-                            gamePanel.Controls.Remove(x);
-
-                            gamePanel.Controls.Add(repTile);
-                        }
-                    }
+                    
                 }
             }
 
