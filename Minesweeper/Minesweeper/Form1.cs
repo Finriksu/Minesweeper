@@ -496,16 +496,19 @@ namespace Minesweeper
 
             foreach (Control x in gamePanel.Controls)
             {
-                if(x is Tile)
+                if(x is Tile && !(x is BombTile))
                 {
-                    Tile checkTile = x as Tile;
+                    bool isAdjacent = false;
 
                     for (int i = 0; i < 3; i++)
                     {
-                        if ((checkTile.RowId == rowIds[i]) && (checkTile.ColumnId == columnIds[j]))
+                        if(((Tile)x).RowId == rowIds[i] && ((Tile)x).ColumnId == columnIds[j])
                         {
-                            if (!(checkTile is BombTile))
-                            {
+                            isAdjacent = true;
+                        }
+
+                        if (isAdjacent)
+                        {
                                 EmptyTile repTile = new EmptyTile();
                                 Point repLocation = x.Location;
                                 repTile.Location = repLocation;
@@ -513,7 +516,6 @@ namespace Minesweeper
                                 gamePanel.Controls.Remove(x);
 
                                 gamePanel.Controls.Add(repTile);
-                            }
                         }
 
                         if (i == 2 && j != 2)
