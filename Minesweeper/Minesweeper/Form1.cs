@@ -25,7 +25,7 @@ namespace Minesweeper
         Timer gameTimer = new Timer();
         int flagCount;
         int gameCount = 0;
-        List<Tile> tileList;
+        int tilesClicked = -2;
 
         public MainForm()
         {
@@ -140,18 +140,18 @@ namespace Minesweeper
                             ((Tile)x).Disable();
                         }
                     }
-                    
-                    MessageBox.Show("lost");
+
+                    string lostText = "You Lost!" + "\r" + "Score = " + second/gameCount;
+                    MessageBox.Show("You Lost!", "Game Over");
 
                 }
-                checkAdjacent(repTile);
+                //checkAdjacent(repTile);
                 checkWin();
             }
         }
         private void checkWin()
         {
             int tilesToWin = 0;
-            int tilesClicked = -2;
             int tilesLeft = 0;
             
             foreach(Control x in gamePanel.Controls)
@@ -474,29 +474,24 @@ namespace Minesweeper
             gamePanel.Controls.Add(flagLabel);
         }
 
-        private void checkAdjacent(Tile clickedTile)
+        private void checkAdjacent(Tile checkTile)
         {           
-            int clickedRow = clickedTile.RowId;
-            int clickedColumn = clickedTile.ColumnId;
-
             int[] rowIds = new int[3];
             int[] columnIds = new int[3];
 
-            rowIds[0] = clickedRow - 1;
-            rowIds[1] = clickedRow;
-            rowIds[2] = clickedRow + 1;
+            rowIds[0] = checkTile.RowId - 1;
+            rowIds[1] = checkTile.RowId;
+            rowIds[2] = checkTile.RowId + 1;
 
-            columnIds[0] = clickedColumn - 1;
-            columnIds[1] = clickedColumn;
-            columnIds[2] = clickedColumn + 1;
+            columnIds[0] = checkTile.ColumnId - 1;
+            columnIds[1] = checkTile.ColumnId;
+            columnIds[2] = checkTile.ColumnId + 1;
 
             int j = 0;
 
-            
-
             foreach (Control x in gamePanel.Controls)
             {
-                if(x is Tile && !(x is BombTile))
+                if(x is UncoveredTile)
                 {
                     bool isAdjacent = false;
 
@@ -516,6 +511,8 @@ namespace Minesweeper
                                 gamePanel.Controls.Remove(x);
 
                                 gamePanel.Controls.Add(repTile);
+
+                            tilesClicked++;
                         }
 
                         if (i == 2 && j != 2)
