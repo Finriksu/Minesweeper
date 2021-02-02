@@ -495,16 +495,10 @@ namespace Minesweeper
             {
                 if (x is UncoveredTile)
                 {
-                    bool isAdjacent = false;
 
                     for (int i = 0; i < 3; i++)
                     {
                         if (((Tile)x).RowId == rowIds[i] && ((Tile)x).ColumnId == columnIds[j])
-                        {
-                            isAdjacent = true;
-                        }
-
-                        if (isAdjacent)
                         {
                             EmptyTile repTile = new EmptyTile();
                             Point repLocation = x.Location;
