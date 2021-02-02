@@ -14,7 +14,7 @@ namespace Minesweeper
     {
         Panel gamePanel = new Panel();
         Label timeLabel = new Label();
-        Label flagLabel = new Label();
+        Label flagLabel = new Label(); 
         RadioButton easyRB = new RadioButton();
         RadioButton normalRB = new RadioButton();
         RadioButton hardRB = new RadioButton();
@@ -236,7 +236,7 @@ namespace Minesweeper
         }
 
         /// <summary>
-        /// Creates the tiles
+        /// Creates the tiles and adds them to a list
         /// </summary>
         private void createTiles()
         {
@@ -303,6 +303,12 @@ namespace Minesweeper
 
         }
 
+        /// <summary>
+        /// Mixes the tiles to random order from unMixedList and adds them to a list
+        /// </summary>
+        /// <param name="unMixedList">list of tiles created in createPanel()</param>
+        /// <param name="rowLenght">determines how long a row on the gamepanel is and uses it to give the tiles a location</param>
+        /// <returns></returns>
         private List<Tile> mixTiles(List<Tile> unMixedList, int rowLenght)
         {
             List<Tile> mixedList = new List<Tile>();
@@ -353,6 +359,11 @@ namespace Minesweeper
             return mixedList;
         }
 
+        /// <summary>
+        /// Replaces a tile when it is clicked
+        /// </summary>
+        /// <param name="sender">a tile on the gamepanel which is clicked</param>
+        /// <param name="e"></param>
         private void replaceTile(object sender, MouseEventArgs e)
         {
             Tile clickedTile = sender as Tile;
@@ -461,6 +472,10 @@ namespace Minesweeper
             }
         }
 
+        /// <summary>
+        /// Checks if adjacent tiles from the clicked tile are empty(not a bomb tile or next to one)
+        /// </summary>
+        /// <param name="checkTile">tile to be checked</param>
         private void checkAdjacent(Tile checkTile)
         {
             int[] rowIds = new int[3];
@@ -516,6 +531,9 @@ namespace Minesweeper
 
         }
 
+        /// <summary>
+        /// Checks if the user has won the game. Occurs when there are no undiscoverd tiles left, only bomb tiles and flag tiles
+        /// </summary>
         private void checkWin()
         {
             int tilesToWin = 0;
@@ -560,6 +578,11 @@ namespace Minesweeper
                 
         }
 
+        /// <summary>
+        /// Starts a new game
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void toolStripMenuNewGame_Click(object sender, EventArgs e)
         {
             newGame();
