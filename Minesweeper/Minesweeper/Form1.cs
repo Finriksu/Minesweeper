@@ -491,6 +491,9 @@ namespace Minesweeper
 
             int j = 0;
 
+            //Tämän pitäisi tarkistaa lattaa ympäröivät laatat ja muuttaa ne tyhjiksi laatoiksi jos niissä ei ole miinaa
+            //mutta muutaa laatat pelkästään klikatun laatan oikealta puolelta. Joskus debuggerilla katsoessa muuttaa myös vasemman ylälaatan.
+
             foreach (Control x in gamePanel.Controls)
             {
                 if (x is UncoveredTile)
