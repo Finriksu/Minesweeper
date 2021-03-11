@@ -499,10 +499,12 @@ namespace Minesweeper
 
             //HUOM BUGI LÖYDETTY, SYY SELVITETTÄVÄ VIELÄ!!!
             //Vaikuttaa vain joka toiseen laattaan. Mikäli jokin (joka toisesta) laatasta on laatta mitä klikattiin tai pommilaatta, vaikuttaa siitä seuraavaan laattaan oikealle päin.
+            //Jos breakpoint rivillä 506 (*), debugger jää jumiin t_Tick(). Pitää step out, jotta pääsee pois.
+            //Mutta kun en heti step outannu t_Tick():stä, vaan menin sen muutamia kertoja läpi, niin tarkisti seuraavan laatan, eikä hypännyt seuraavasta yli.
 
             foreach (Control x in gamePanel.Controls)
             {
-                if (x is UncoveredTile)
+                if (x is UncoveredTile) //*
                 {
                     MessageBox.Show("" + ((Tile)x).ColumnId + "_" + ((Tile)x).RowId);
 
