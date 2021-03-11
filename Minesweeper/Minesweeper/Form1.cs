@@ -164,9 +164,12 @@ namespace Minesweeper
                 second++;
 
                 if (second / gameCount < 10)
-                    time += "0" + second / gameCount;
+                    time = "00" + second / gameCount;
+                else if (second / gameCount < 100)
+                    time = "0" + second / gameCount;
                 else
-                    time += second / gameCount;
+                    time = (second / gameCount).ToString();
+
                 if (second < 1000)
                     timeLabel.Text = time;
                 else
@@ -494,24 +497,32 @@ namespace Minesweeper
             //Tämän pitäisi tarkistaa lattaa ympäröivät laatat ja muuttaa ne tyhjiksi laatoiksi jos niissä ei ole miinaa
             //mutta muutaa laatat pelkästään klikatun laatan oikealta puolelta. Joskus debuggerilla katsoessa muuttaa myös vasemman ylälaatan.
 
+            //HUOM BUGI LÖYDETTY, SYY SELVITETTÄVÄ VIELÄ!!!
+            //Vaikuttaa vain joka toiseen laattaan. Mikäli jokin (joka toisesta) laatasta on laatta mitä klikattiin tai pommilaatta, vaikuttaa siitä seuraavaan laattaan oikealle päin.
+
             foreach (Control x in gamePanel.Controls)
             {
                 if (x is UncoveredTile)
                 {
+                    MessageBox.Show("" + ((Tile)x).ColumnId + "_" + ((Tile)x).RowId);
 
+                    EmptyTile repTile = new EmptyTile();
+                    Point repLocation = x.Location;
+                    repTile.Location = repLocation;
+
+                    gamePanel.Controls.Remove(x);
+
+                    gamePanel.Controls.Add(repTile);
+
+                    tilesClicked++;
+
+
+                    /*
                     for (int i = 0; i < 3; i++)
                     {
-                        if (((Tile)x).RowId == rowIds[i] && ((Tile)x).ColumnId == columnIds[j])
+                        if (((Tile)x).ColumnId == columnIds[i] && ((Tile)x).RowId == rowIds[j])
                         {
-                            EmptyTile repTile = new EmptyTile();
-                            Point repLocation = x.Location;
-                            repTile.Location = repLocation;
-
-                            gamePanel.Controls.Remove(x);
-
-                            gamePanel.Controls.Add(repTile);
-
-                            tilesClicked++;
+                            
                         }
 
                         if (i == 2 && j != 2)
@@ -520,7 +531,7 @@ namespace Minesweeper
                             j++;
                         }
                     }
-
+                    */
 
                 }
             }
