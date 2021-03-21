@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using System.Windows.Forms;
 
 namespace Minesweeper
@@ -20,12 +21,14 @@ namespace Minesweeper
         RadioButton hardRB = new RadioButton();
         Form difficultyForm = new Form();
         Timer gameTimer = new Timer();
+        
         bool gameOver = false;
         int second = 0;
         private int difficulty = 0;
         int flagCount;
         int gameCount = 0;
-        int tilesClicked = -2;
+        int tilesToWin = 0;
+        int tilesClicked = 0;
 
         public MainForm()
         {
@@ -132,7 +135,7 @@ namespace Minesweeper
         {
             gameTimer.Interval = 1000;
             gameTimer.Tick += new EventHandler(this.t_Tick);
-            gameTimer.Enabled = true;
+            gameTimer.Enabled = false;
 
             timeLabel.AutoSize = true;
             timeLabel.Font = new Font("Microsoft Sans Serif", 16);
@@ -149,6 +152,7 @@ namespace Minesweeper
 
             gamePanel.Controls.Add(timeLabel);
             gameTimer.Start();
+       
         }
 
         /// <summary>
@@ -181,9 +185,9 @@ namespace Minesweeper
                 gameTimer.Enabled = false;
             }
 
-
-
         }
+
+        
 
         /// <summary>
         /// Displays how many bombtiles there are left without a flag on them.
@@ -255,6 +259,7 @@ namespace Minesweeper
                     bombCount = 10;
                     tileCount = 81;
                     rowLenght = 9;
+                    tilesToWin = tileCount - bombCount;
 
                     this.MaximumSize = new Size(216, 303);
                     this.MinimumSize = new Size(216, 303);
@@ -263,6 +268,7 @@ namespace Minesweeper
                     bombCount = 40;
                     tileCount = 256;
                     rowLenght = 16;
+                    tilesToWin = tileCount - bombCount;
 
                     this.MaximumSize = new Size(356, 443);
                     this.MinimumSize = new Size(356, 443);
@@ -271,6 +277,7 @@ namespace Minesweeper
                     bombCount = 99;
                     tileCount = 480;
                     rowLenght = 30;
+                    tilesToWin = tileCount - bombCount;
 
                     this.MaximumSize = new Size(636, 443);
                     this.MinimumSize = new Size(636, 443);
@@ -430,17 +437,7 @@ namespace Minesweeper
             {
                 if(clickedTile.Tag.ToString() != "Bomb" && clickedTile.Name != "Flag")
                 {
-                    clickedTile.BackgroundImage = Properties.Resources.tileEmpty;
-                    clickedTile.Name = "Empty";
-
-                    gamePanel.Controls.Remove(clickedTile);
-
-                    repTile = new EmptyTile();
-                    repTile.Location = repLocation;
-                    repTile.RowId = repRowId;
-                    repTile.ColumnId = repColumnId;
-                    repTile.MouseDown += replaceTile;
-                    gamePanel.Controls.Add(repTile);
+                    checkAdjacent(clickedTile);
                 }
                 else if (clickedTile.Tag.ToString() == "Bomb" && clickedTile.Name != "Flag")
                 {
@@ -468,9 +465,7 @@ namespace Minesweeper
 
                     string lostText = "You Lost!" + "\r" + "Score = " + second/gameCount;
                     MessageBox.Show("You Lost!", "Game Over");
-
                 }
-                checkAdjacent(repTile);
                 checkWin();
             }
         }
@@ -492,88 +487,132 @@ namespace Minesweeper
             columnIds[1] = checkTile.ColumnId;
             columnIds[2] = checkTile.ColumnId + 1;
 
-            int j = 0;
+            int bombcount = 0;
 
             //Tämän pitäisi tarkistaa lattaa ympäröivät laatat ja muuttaa ne tyhjiksi laatoiksi jos niissä ei ole miinaa
             //mutta muutaa laatat pelkästään klikatun laatan oikealta puolelta. Joskus debuggerilla katsoessa muuttaa myös vasemman ylälaatan.
 
             //HUOM BUGI LÖYDETTY, SYY SELVITETTÄVÄ VIELÄ!!!
             //Vaikuttaa vain joka toiseen laattaan. Mikäli jokin (joka toisesta) laatasta on laatta mitä klikattiin tai pommilaatta, vaikuttaa siitä seuraavaan laattaan oikealle päin.
-            //Jos breakpoint rivillä 506 (*), debugger jää jumiin t_Tick(). Pitää step out, jotta pääsee pois.
-            //Mutta kun en heti step outannu t_Tick():stä, vaan menin sen muutamia kertoja läpi, niin tarkisti seuraavan laatan, eikä hypännyt seuraavasta yli.
+            //EI JOHDU TIMERISTA
 
             foreach (Control x in gamePanel.Controls)
             {
-                if (x is UncoveredTile) //*
+                
+                if (x is Tile)
                 {
-                    MessageBox.Show("" + ((Tile)x).ColumnId + "_" + ((Tile)x).RowId);
+                    //MessageBox.Show("ID: " + ((Tile)x).ColumnId + "_" + ((Tile)x).RowId + "location: " + x.Location);
 
-                    EmptyTile repTile = new EmptyTile();
-                    Point repLocation = x.Location;
-                    repTile.Location = repLocation;
+                    //Käy kaikki laatat läpi, mikäli tämä pätkä ei ole käytössä
 
-                    gamePanel.Controls.Remove(x);
-
-                    gamePanel.Controls.Add(repTile);
-
-                    tilesClicked++;
-
-
-                    /*
                     for (int i = 0; i < 3; i++)
                     {
-                        if (((Tile)x).ColumnId == columnIds[i] && ((Tile)x).RowId == rowIds[j])
+                        if (((Tile)x).ColumnId == columnIds[i] && ((Tile)x).RowId == rowIds[0])
                         {
-                            
+                            //MessageBox.Show("x CID: " + ((Tile)x).ColumnId + " x RID: " + ((Tile)x).RowId + "\nCheck CID: " + columnIds[i] + " Check RID: " + rowIds[0]);
+                            if (x is BombTile)
+                            {
+                                bombcount++;
+                            }
+                            else if (x is UncoveredTile)
+                            {
+                                checkAdjacent(x as Tile);
+                            }
                         }
-
-                        if (i == 2 && j != 2)
+                        else if (((Tile)x).ColumnId == columnIds[i] && ((Tile)x).RowId == rowIds[1])
                         {
-                            i = 0;
-                            j++;
+                            if (x is BombTile)
+                            {
+                                bombcount++;
+                            }
+                            else if (x is UncoveredTile)
+                            {
+                                checkAdjacent(x as Tile);
+                            }
+                        }
+                        else if (((Tile)x).ColumnId == columnIds[i] && ((Tile)x).RowId == rowIds[2])
+                        {
+                            if (x is BombTile)
+                            {
+                                bombcount++;
+                            }
+                            else if (x is UncoveredTile)
+                            {
+                                checkAdjacent(x as Tile); //TÄMÄ MUUALLE
+                            }
                         }
                     }
-                    */
-
                 }
             }
 
+            if (bombcount == 1)
+            {
+                Tile1 replaceTile = new Tile1();
+                replaceTile.Location = checkTile.Location;
 
+                gamePanel.Controls.Remove(checkTile);
+                gamePanel.Controls.Add(replaceTile);
+
+                tilesClicked++;
+            }
+            else if (bombcount == 2)
+            {
+                Tile2 replaceTile = new Tile2();
+                replaceTile.Location = checkTile.Location;
+
+                gamePanel.Controls.Remove(checkTile);
+                gamePanel.Controls.Add(replaceTile);
+
+                tilesClicked++;
+            }
+            else if (bombcount == 3)
+            {
+                Tile3 replaceTile = new Tile3();
+                replaceTile.Location = checkTile.Location;
+
+                gamePanel.Controls.Remove(checkTile);
+                gamePanel.Controls.Add(replaceTile);
+
+                tilesClicked++;
+            }
+            else if (bombcount == 4)
+            {
+                Tile4 replaceTile = new Tile4();
+                replaceTile.Location = checkTile.Location;
+
+                gamePanel.Controls.Remove(checkTile);
+                gamePanel.Controls.Add(replaceTile);
+
+                tilesClicked++;
+            }
+            else if (bombcount == 5)
+            {
+                Tile5 replaceTile = new Tile5();
+                replaceTile.Location = checkTile.Location;
+
+                gamePanel.Controls.Remove(checkTile);
+                gamePanel.Controls.Add(replaceTile);
+
+                tilesClicked++;
+            }
+            else
+            {
+                EmptyTile replaceTile = new EmptyTile();
+                replaceTile.Location = checkTile.Location;
+
+                gamePanel.Controls.Remove(checkTile);
+                gamePanel.Controls.Add(replaceTile);
+
+                tilesClicked++;
+            }
         }
 
         /// <summary>
         /// Checks if the user has won the game. Occurs when there are no undiscoverd tiles left, only bomb tiles and flag tiles
         /// </summary>
         private void checkWin()
-        {
-            int tilesToWin = 0;
-            int tilesLeft = 0;
-            
-            foreach(Control x in gamePanel.Controls)
-            {
-                if(!(x is BombTile || x is FlagTile || x is UncoveredTile))
-                {
-                    tilesClicked++;
-                }
-            }
-
-            switch (difficulty)
-            {
-                case 0:
-                    tilesToWin = 10;
-                    tilesLeft = 81;
-                    break;
-                case 1:
-                    tilesToWin = 40;
-                    tilesLeft = 256;
-                    break;
-                case 2:
-                    tilesToWin = 99;
-                    tilesLeft = 480;
-                    break;
-            }
-
-            if (tilesLeft - tilesClicked == tilesToWin && tilesToWin != 0)
+        {       
+            if (tilesClicked == tilesToWin && tilesToWin != 0)
             {
                 foreach (Control x in gamePanel.Controls)
                 {
@@ -585,7 +624,6 @@ namespace Minesweeper
                 gameOver = true;
                 MessageBox.Show("Victory");
             }
-                
         }
 
         /// <summary>

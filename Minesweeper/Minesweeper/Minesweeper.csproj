@@ -66,6 +66,21 @@
     <Compile Include="Tile.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Tile1.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Tile2.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Tile3.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Tile4.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Tile5.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="UncoveredTile.cs">
       <SubType>Component</SubType>
     </Compile>
